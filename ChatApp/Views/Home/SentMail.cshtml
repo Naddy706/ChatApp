@@ -1,0 +1,43 @@
+﻿
+@{
+    ViewBag.Title = "SentMail";
+}
+
+<h2>SentMail</h2>
+
+<h1 class="text-info">Confirmation Email has been sent to Your Email Kindly confirm your email then Try to login...</h1>
+
+
+@Html.Hidden("myurl", Url.Action("LogOff", "Account"))
+@section Scripts{
+
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script>
+
+
+         function gettoken() {
+        var token = '@Html.AntiForgeryToken()';
+        token = $(token).val();
+        return token;
+   }
+
+        $(document).ready(function () {
+            var myurl = $("#myurl").val();
+            $.ajax({
+                type: "Post",
+                url: myurl,
+                data: {__RequestVerificationToken: gettoken()},
+                success: function () {
+                    console.log("done");
+                    window.location.reload();
+                }
+            });
+        });
+
+
+    </script>
+
+
+
+
+}

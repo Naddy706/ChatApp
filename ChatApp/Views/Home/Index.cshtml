@@ -1,0 +1,129 @@
+﻿@{
+    ViewBag.Title = "Chat Page";
+}
+
+<div class="row">
+    <div class="col-md-4">
+        <div id="Userslist" style="overflow: scroll ; margin-top:100px;height:500px;background-image:url(../../Content/Images/UserBackground.jpg)">
+
+
+        </div>
+
+    </div>
+    <div class="col-md-8">
+
+
+        <div class="jumbotron" style="overflow: scroll ; margin-top:100px;height:500px;background-image:url(../../Content/Images/background1.jpg); background-repeat: no-repeat; background-size: cover;">
+            <div id="Messagelist">
+
+            </div>
+
+        </div>
+        <div class="fixed-bottom">
+            <h2 id="heading" style="color:white;">Please Select A User To chat with... </h2>
+            @using (Ajax.BeginForm("Create", "Home", new AjaxOptions
+            {
+                HttpMethod = "POST",
+                //UpdateTargetId = "divEmp",
+                // LoadingElementDuration = 3000,
+                // LoadingElementId = "gifid",
+                //   Confirm = "Are sure you want to sent this message",
+                OnBegin = "return StartValidation();",
+                OnComplete = "Progresscompelete",
+                OnSuccess = "SuccessForm",
+                OnFailure = "Onfail",
+
+            }, new { enctype = "multipart/form-data", @id = "Form" }))
+            {
+
+
+                @Html.AntiForgeryToken()
+
+                <textarea cols="180" rows="4" name="Messages" id="Message_Id"></textarea>
+                <input type="file" name="ImageFiles" multiple="multiple" class="btn btn-info" id="ImageFiles" />
+                <input type="text" name="recevier_Id" id="recevier_Id" hidden />
+                <input type="submit" value="Send" class="btn btn-success" id="submitbtn" />
+            }
+            <input type="text" hidden id="Uid" value="@ViewBag.Id" />
+        </div>
+        <div id="gifid">
+        <p>Sending Message....<p>
+                <img src="http://chatdemo.somee.com/Images/loader.gif" />
+            </div>
+
+    </div>
+
+</div>
+@Html.Hidden("MyURL", Url.Action("GetOnlineUser", "Home"))
+@Html.Hidden("MyMessage", Url.Action("GetMessages", "Home"))
+@Html.Hidden("MyNoti", Url.Action("GetMessageNotification", "Home"))
+@section Scripts{
+
+    <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+    <script src="~/Scripts/notify.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.4.1.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <script src="~/Scripts/signalRqueries.js"></script>
+    <script>
+
+        //function Progressbegin() {
+        //    //  alert("Progressbegin");
+
+        //    $("#gifid").show();
+
+
+        //}
+
+        function StartValidation() {
+            var rid = $("#recevier_Id").val();
+            var mes = $("#Message_Id").val();
+            var file = $("#ImageFiles").val();
+            if (rid != "") {
+                if (mes != "" || file.length > 1) {
+                      $.notify("Please Wait sending Message", "info");
+                    $("#gifid").show();
+                    return true;
+                }
+                else {
+                    $("#submitbtn").notify("message canot be empty");
+
+                    //  $.notify("#submitbtn", "")
+                    return false;
+                }
+            }
+            else {
+                $("#submitbtn").notify("Please select a User to send Message");
+
+                return false;
+            }
+
+        }
+
+
+        function Progresscompelete() {
+            // alert("Progresscompelete");
+            $.notify('Message delivered sucessfully', 'info')
+        }
+
+        function SuccessForm() {
+            //   alert("SuccessForm");
+            $.notify('Message sent sucessfully', 'success')
+            $("#gifid").hide();
+            $("#Message_Id").val("");
+            $("#ImageFiles").val("");
+
+
+        }
+
+        function Onfail() {
+            //   alert("Onfail");
+            $.notify("BOOM! message sending failed", "error");
+        }
+
+
+    </script>
+
+
+
+
+}
